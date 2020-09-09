@@ -48,6 +48,7 @@ const reasons: ISmartSnippetReason[] = [
 ];
 
 const BASE_CLASSNAME = 'coveo-smart-snippet';
+const QUESTION_CLASSNAME = `${BASE_CLASSNAME}-question`;
 const ANSWER_CONTAINER_CLASSNAME = `${BASE_CLASSNAME}-answer`;
 const HAS_ANSWER_CLASSNAME = `${BASE_CLASSNAME}-has-answer`;
 const SHADOW_CLASSNAME = `${BASE_CLASSNAME}-content`;
@@ -57,6 +58,7 @@ const SOURCE_TITLE_CLASSNAME = `${SOURCE_CLASSNAME}-title`;
 const SOURCE_URL_CLASSNAME = `${SOURCE_CLASSNAME}-url`;
 
 export const SmartSnippetClassNames = {
+  QUESTION_CLASSNAME,
   ANSWER_CONTAINER_CLASSNAME,
   HAS_ANSWER_CLASSNAME,
   SHADOW_CLASSNAME,
@@ -80,6 +82,7 @@ export class SmartSnippet extends Component {
   };
 
   private lastRenderedResult: IQueryResult;
+  private questionContainer: HTMLElement;
   private shadowContainer: HTMLElement;
   private sourceContainer: HTMLElement;
   private snippetContainer: HTMLElement;
@@ -139,10 +142,15 @@ export class SmartSnippet extends Component {
       {
         className: ANSWER_CONTAINER_CLASSNAME
       },
+      this.buildQuestion(),
       this.buildShadow(),
       this.buildHeightLimiter(),
       this.buildSourceContainer()
     ).el;
+  }
+
+  private buildQuestion() {
+    return (this.questionContainer = $$('div', { className: QUESTION_CLASSNAME }).el);
   }
 
   private buildShadow() {
@@ -160,11 +168,8 @@ export class SmartSnippet extends Component {
   }
 
   private buildHeightLimiter() {
-    return (this.heightLimiter = new HeightLimiter(
-      this.shadowContainer,
-      this.snippetContainer,
-      400,
-      isExpanded => (isExpanded ? this.sendExpandSmartSnippetAnalytics() : this.sendCollapseSmartSnippetAnalytics())
+    return (this.heightLimiter = new HeightLimiter(this.shadowContainer, this.snippetContainer, 400, isExpanded =>
+      isExpanded ? this.sendExpandSmartSnippetAnalytics() : this.sendCollapseSmartSnippetAnalytics()
     )).toggleButton;
   }
 
@@ -204,6 +209,7 @@ export class SmartSnippet extends Component {
 
   private async render(questionAnswer: IQuestionAnswerResponse) {
     this.ensureDom();
+    this.questionContainer.innerText = questionAnswer.question;
     this.renderSnippet(questionAnswer.answerSnippet);
     const lastRenderedResult = this.getCorrespondingResult(questionAnswer);
     if (lastRenderedResult) {

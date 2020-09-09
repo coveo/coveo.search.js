@@ -19,6 +19,12 @@
     display: block;
   }
 
+  @at-root .coveo-smart-snippet-question {
+    font-size: 18px;
+    border-bottom: $default-medium-border;
+    padding-bottom: 10px;
+  }
+
   @at-root .coveo-smart-snippet-answer {
     display: flex;
     flex-direction: column;
@@ -35,7 +41,7 @@
 
         &::after {
           content: '';
-          @include linear-gradient(top, rgba(255,255,255,0), rgba(255, 255, 255, 1));
+          @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
           pointer-events: none;
           display: inline-block;
           position: absolute;

@@ -175,6 +175,7 @@ export function SmartSnippetTest() {
 
         it('should render the snippet followed by the source in the answer container', () => {
           expectChildren(getFirstChild(ClassNames.ANSWER_CONTAINER_CLASSNAME), [
+            ClassNames.QUESTION_CLASSNAME,
             ClassNames.SHADOW_CLASSNAME,
             HeightLimiterClassNames.BUTTON_CLASSNAME,
             ClassNames.SOURCE_CLASSNAME
