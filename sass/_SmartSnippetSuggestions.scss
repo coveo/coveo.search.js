@@ -65,6 +65,40 @@
           padding: 8px $inner-padding;
         }
       }
+
+      &-source {
+        margin-top: 24px;
+
+        &-url,
+        &-title {
+          padding: 0 $inner-padding;
+        }
+
+        &-url {
+          display: block;
+          color: $color-strong-contrast-grey;
+          text-decoration: none;
+
+          &:hover,
+          &:focus {
+            text-decoration: underline;
+          }
+        }
+
+        &-title {
+          margin-top: 8px;
+          display: block;
+          font-size: 19px;
+          color: $coveo-blue;
+          text-decoration: none;
+          padding-bottom: $inner-padding;
+
+          &:hover,
+          &:focus {
+            text-decoration: underline;
+          }
+        }
+      }
     }
   }
 }

@@ -5,7 +5,7 @@ import { IComponentBindings } from '../Base/ComponentBindings';
 import { QueryEvents, IQuerySuccessEventArgs } from '../../events/QueryEvents';
 import { IPartialQuestionAnswerResponse, IQuestionAnswerResponse } from '../../rest/QuestionAnswerResponse';
 import { $$, Dom } from '../../utils/Dom';
-import { uniqueId, isEqual } from 'underscore';
+import { uniqueId, isEqual, find } from 'underscore';
 import { SmartSnippetCollapsibleSuggestion } from './SmartSnippetCollapsibleSuggestion';
 import { l } from '../../strings/Strings';
 import { Initialization } from '../Base/Initialization';
@@ -39,6 +39,16 @@ export class SmartSnippetSuggestions extends Component {
     return this.contentLoaded;
   }
 
+  /**
+   * @warning This method only works for the demo. In practice, the source of the answer will not always be part of the results.
+   */
+  private getCorrespondingResult(questionAnswer: IPartialQuestionAnswerResponse) {
+    return find(
+      this.queryController.getLastResults().results,
+      result => result.raw[questionAnswer.documentId.contentIdKey] === questionAnswer.documentId.contentIdValue
+    );
+  }
+
   private handleQuerySuccess(data: IQuerySuccessEventArgs) {
     const questionAnswer = data.results.questionAnswer;
     const hasQuestions = !!(questionAnswer && questionAnswer.relatedQuestions.length);
@@ -68,7 +78,9 @@ export class SmartSnippetSuggestions extends Component {
 
   private buildQuestionAnswers(questionAnswers: IPartialQuestionAnswerResponse[]) {
     const innerCSS = this.getInnerCSS();
-    const answers = questionAnswers.map(questionAnswer => new SmartSnippetCollapsibleSuggestion(questionAnswer, innerCSS));
+    const answers = questionAnswers.map(
+      questionAnswer => new SmartSnippetCollapsibleSuggestion(questionAnswer, innerCSS, this.getCorrespondingResult(questionAnswer))
+    );
     const container = $$(
       'ul',
       { className: QUESTIONS_LIST_CLASSNAME, ariaLabelledby: this.titleId },

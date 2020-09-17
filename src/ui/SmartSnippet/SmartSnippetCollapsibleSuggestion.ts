@@ -5,6 +5,7 @@ import { SVGIcons } from '../../utils/SVGIcons';
 import { attachShadow } from '../../misc/AttachShadowPolyfill';
 import { $$, Dom } from '../../utils/Dom';
 import { l } from '../../strings/Strings';
+import { IQueryResult } from '../../rest/QueryResult';
 
 const QUESTION_CLASSNAME = `coveo-smart-snippet-suggestions-question`;
 const QUESTION_TITLE_CLASSNAME = `${QUESTION_CLASSNAME}-title`;
@@ -13,6 +14,9 @@ const QUESTION_TITLE_CHECKBOX_CLASSNAME = `${QUESTION_TITLE_CLASSNAME}-checkbox`
 const QUESTION_SNIPPET_CLASSNAME = `${QUESTION_CLASSNAME}-snippet`;
 const QUESTION_SNIPPET_HIDDEN_CLASSNAME = `${QUESTION_SNIPPET_CLASSNAME}-hidden`;
 const SHADOW_CLASSNAME = `${QUESTION_SNIPPET_CLASSNAME}-content`;
+const SOURCE_CLASSNAME = `${QUESTION_CLASSNAME}-source`;
+const SOURCE_TITLE_CLASSNAME = `${SOURCE_CLASSNAME}-title`;
+const SOURCE_URL_CLASSNAME = `${SOURCE_CLASSNAME}-url`;
 
 export class SmartSnippetCollapsibleSuggestion {
   private readonly labelId = uniqueId(QUESTION_TITLE_LABEL_CLASSNAME);
@@ -23,7 +27,11 @@ export class SmartSnippetCollapsibleSuggestion {
   private checkbox: Dom;
   private expanded = false;
 
-  constructor(private readonly questionAnswer: IPartialQuestionAnswerResponse, private readonly innerCSS?: string) {}
+  constructor(
+    private readonly questionAnswer: IPartialQuestionAnswerResponse,
+    private readonly innerCSS?: string,
+    private readonly source?: IQueryResult
+  ) {}
 
   public get loading() {
     return this.contentLoaded;
@@ -85,6 +93,10 @@ export class SmartSnippetCollapsibleSuggestion {
     this.contentLoaded = attachShadow(shadowContainer.el, { mode: 'open', title: l('AnswerSpecificSnippet', title) }).then(shadowRoot => {
       shadowRoot.appendChild(this.buildAnswerSnippetContent(innerHTML, style).el);
     });
+    if (this.source) {
+      this.collapsibleContainer.append(this.buildSourceUrl(this.source.clickUri));
+      this.collapsibleContainer.append(this.buildSourceTitle(this.source.title, this.source.clickUri));
+    }
     return this.collapsibleContainer;
   }
 
@@ -95,6 +107,20 @@ export class SmartSnippetCollapsibleSuggestion {
       container.append(style);
     }
     return container;
+  }
+
+  private buildSourceTitle(title: string, clickUri: string) {
+    return this.buildLink(title, clickUri, SOURCE_TITLE_CLASSNAME);
+  }
+
+  private buildSourceUrl(url: string) {
+    return this.buildLink(url, url, SOURCE_URL_CLASSNAME);
+  }
+
+  private buildLink(text: string, href: string, className: string) {
+    const element = $$('a', { className, href }).el as HTMLAnchorElement;
+    element.innerText = text;
+    return element;
   }
 
   private toggle() {
